@@ -194,6 +194,9 @@
     .opciones.rejilla .emoji { font-size: 2.6rem; line-height: 1; }
     .opciones.rejilla .nombre { font-size: 0.98rem; line-height: 1.25; }
     .opciones.rejilla label:active { transform: scale(0.97); }
+    .opciones.rejilla .nombre small { margin-top: 4px; }
+    .subtitulo { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--suave); margin: 4px 0 10px; }
+    .opciones.rejilla + .subtitulo { margin-top: 24px; }
   </style>
 </head>
 
@@ -225,11 +228,12 @@
       <button type="button" class="boton-principal siguiente">Empezar</button>
     </section>
 
-    <form id="formulario">
+    <form id="formulario" autocomplete="off">
       <!-- PANTALLA 1 · Tipo de ropa (se pueden marcar varias) -->
       <section class="pantalla" data-campo="tejido">
         <h2 class="pregunta">¿Qué vas a lavar?</h2>
         <p class="ayuda">Marca todo lo que lleves</p>
+        <h3 class="subtitulo">Ropa</h3>
         <div class="opciones rejilla">
           <label><input type="checkbox" name="tejido" value="algodon"><span class="emoji" aria-hidden="true">👚</span><span class="nombre">Algodón / lino</span></label>
           <label><input type="checkbox" name="tejido" value="toallas"><span class="emoji" aria-hidden="true">🛏️</span><span class="nombre">Toallas y sábanas</span></label>
@@ -239,6 +243,12 @@
           <label><input type="checkbox" name="tejido" value="vaqueros"><span class="emoji" aria-hidden="true">👖</span><span class="nombre">Vaqueros</span></label>
           <label><input type="checkbox" name="tejido" value="delicado"><span class="emoji" aria-hidden="true">👗</span><span class="nombre">Delicado / seda</span></label>
           <label><input type="checkbox" name="tejido" value="lana"><span class="emoji" aria-hidden="true">🧣</span><span class="nombre">Lana</span></label>
+        </div>
+
+        <h3 class="subtitulo">Paños de limpieza</h3>
+        <div class="opciones rejilla">
+          <label><input type="checkbox" name="tejido" value="panosAlgodon"><span class="emoji" aria-hidden="true">🧽</span><span class="nombre">Paños de algodón<small>Bayetas y paños de cocina</small></span></label>
+          <label><input type="checkbox" name="tejido" value="panosMicro"><span class="emoji" aria-hidden="true">🪟</span><span class="nombre">Paños de microfibra<small>Para cristales y polvo</small></span></label>
         </div>
         <div class="pie"><button type="button" class="boton-principal siguiente">Siguiente</button></div>
       </section>
@@ -262,7 +272,7 @@
         <div class="opciones lista">
           <label><input type="radio" name="suciedad" value="ligera"> Ligera <small>Sin manchas, solo usada o con olor</small></label>
           <label><input type="radio" name="suciedad" value="normal"> Normal <small>Algo de sudor o manchas leves</small></label>
-          <label><input type="radio" name="suciedad" value="intensa"> Mucho <small>Manchas visibles, ropa de trabajo o trapos</small></label>
+          <label><input type="radio" name="suciedad" value="intensa"> Mucho <small>Manchas visibles, ropa de trabajo o paños de cocina</small></label>
         </div>
         <div class="pie"><button type="button" class="boton-principal siguiente">Siguiente</button></div>
       </section>
@@ -348,9 +358,8 @@
     // Cuando mezclas ropa, gana el programa MÁS SUAVE (el primero de esta lista)
     const ORDEN_SUAVIDAD = ["lana", "delicado", "camisas", "sport", "oscura", "mix", "sinteticos", "algodon"];
 
-    // Centrifugado recomendado por tipo de ropa (rpm).
+    // Centrifugado recomendado por tipo de ropa (rpm) y por qué.
     // Si mezclas, gana el más bajo para no dañar la prenda más delicada.
-    // Centrifugado recomendado por tipo de ropa (rpm) y por qué
     const CENTRIFUGADO = {
       toallas:    { rpm: 1200, motivo: "las toallas escurren mucho y no se arrugan" },
       algodon:    { rpm: 1000, motivo: "seca bien con menos arrugas que a 1200" },
@@ -360,7 +369,12 @@
       camisas:    { rpm:  600, motivo: "casi sin arrugas, para planchar menos" },
       delicado:   { rpm:  600, motivo: "protege las fibras finas" },
       lana:       { rpm:  400, motivo: "la lana pide el centrifugado más bajo posible para no deformarse" },
+      panosAlgodon: { rpm: 1200, motivo: "los paños de algodón aguantan y salen casi secos" },
+      panosMicro:   { rpm: 1000, motivo: "la microfibra seca enseguida, no necesita más" },
     };
+
+    // Paños de limpieza: se lavan a 60 °C y siempre aparte de la ropa
+    const PANOS = ["panosAlgodon", "panosMicro"];
 
     // ---------- 3.2 CANTIDADES: para una carga normal (4–5 kg) ----------
     // Sanytol: confirmado por la etiqueta (1 tapón = 40 ml).
@@ -371,6 +385,8 @@
       bicarbonato:  { ligera: "1 cucharada",       normal: "1 cucharada",       intensa: "2 cucharadas" },
       percarbonato: { ligera: "1 cucharada",       normal: "1 cucharada",       intensa: "2 cucharadas" },
       bicarbonatoOlor: "2 cucharadas",   // si marcas "Tiene mal olor"
+      // Detergente extra en el cajetín I cuando toca Prelavado (orientativo)
+      prelavado:    "½ cacito (≈ 25 g)",
       // Preparado de ácido cítrico: 1 cucharada disuelta en 500 ml de agua
       acidoCitrico:      "100 ml",
       acidoCitricoSuave: "50 ml",   // lana y delicados: dosis baja
@@ -388,6 +404,7 @@
     const NOMBRE_TEJIDO = {
       algodon: "algodón", toallas: "toallas", sinteticos: "sintéticos", camisas: "camisas",
       deporte: "deporte", vaqueros: "vaqueros", delicado: "delicados", lana: "lana",
+      panosAlgodon: "paños de algodón", panosMicro: "paños de microfibra",
     };
 
     // ---------- 3.3 LÓGICA ----------
@@ -403,6 +420,8 @@
         case "vaqueros":   return "oscura";
         case "delicado":   return "delicado";
         case "lana":       return "lana";
+        case "panosAlgodon": return "algodon";
+        case "panosMicro":   return "sinteticos";
       }
     }
 
@@ -427,11 +446,18 @@
       const consejos = [];
       const tiene = t => tejidos.includes(t);
 
+      const soloPanos = tejidos.every(t => PANOS.includes(t));
+
       // 1. Programa
       let prog = combinarProgramas(tejidos.map(t => programaDe(t, suciedad)), suciedad);
-      const resistente = ["algodon", "sinteticos", "mix"].includes(prog);
-      if (color === "oscuro" && resistente) prog = "oscura";
-      if (prisa && suciedad === "ligera" && resistente && carga !== "mucha") prog = "rapido";
+      if (soloPanos) {
+        // Paños: Sintéticos si hay microfibra (admite 60 °C), si no Algodón
+        prog = tiene("panosMicro") ? "sinteticos" : "algodon";
+      } else {
+        const resistente = ["algodon", "sinteticos", "mix"].includes(prog);
+        if (color === "oscuro" && resistente) prog = "oscura";
+        if (prisa && suciedad === "ligera" && resistente && carga !== "mucha") prog = "rapido";
+      }
 
       // 1b. ¿Cabe la ropa? Si no, pasamos a un programa con más capacidad
       const kilos = KILOS[carga];
@@ -458,7 +484,11 @@
         temp = 60;
         tempMotivo = "las toallas necesitan al menos 60 °C para quedar higiénicas";
       }
-      if (color === "oscuro" && temp > 40) {
+      if (soloPanos) {
+        temp = 60;
+        tempMotivo = "los paños de limpieza necesitan 60 °C para quedar higiénicos";
+      }
+      if (color === "oscuro" && temp > 40 && !soloPanos) {
         temp = 40;
         tempMotivo = "la ropa oscura no pasa de 40 °C para no desteñir";
       }
@@ -485,7 +515,8 @@
       }
 
       // 3. Opciones de la lavadora
-      if (prog === "algodon" && suciedad === "intensa") opciones.push("Prelavado");
+      const prelavado = prog === "algodon" && suciedad === "intensa";
+      if (prelavado) opciones.push("Prelavado");
       if (prog === "camisas") opciones.push("Fácil plancha (cuélgalas aún mojadas)");
 
       // 4. Productos con cantidades
@@ -504,19 +535,27 @@
         donde: soloDeporte ? "Cajetín II · menos cantidad: en ropa técnica el exceso se queda en el tejido" : "Cajetín II",
         cantidad: DOSIS.detergente[NIVELES[nivel]],
       });
+      // Con Prelavado, el manual de Bosch pide detergente también en el cajetín I
+      if (prelavado) {
+        productos.push({ nombre: "Detergente Elena (prelavado)", donde: "Cajetín I", cantidad: DOSIS.prelavado });
+      }
+
+      // Lana, delicados y microfibra: nada alcalino (bicarbonato y percarbonato)
+      const sinAlcalinos = fragil || tiene("panosMicro");
 
       // Bicarbonato solo donde más aporta (nunca en lana ni delicados)
       let paraQue = null;
       if (olor)                                             paraQue = "quita el mal olor";
       else if (tiene("deporte"))                            paraQue = "neutraliza el olor a sudor";
       else if (tiene("toallas"))                            paraQue = "evita el olor a humedad de las toallas";
+      else if (tiene("panosAlgodon"))                       paraQue = "evita el olor a humedad de los paños";
       // En ropa blanca no hace falta: el percarbonato ya hace ese trabajo y mejor
 
-      if (!fragil && paraQue) {
+      if (!sinAlcalinos && paraQue) {
         const cantidadBicarbonato = olor ? DOSIS.bicarbonatoOlor : DOSIS.bicarbonato[suciedad];
         productos.push({ nombre: "Bicarbonato", donde: `En el tambor, antes de la ropa · ${paraQue}`, cantidad: cantidadBicarbonato });
       }
-      if (!fragil && color === "blanco" && suciedad !== "ligera") {
+      if (!sinAlcalinos && color === "blanco" && suciedad !== "ligera") {
         productos.push({ nombre: "Percarbonato", donde: "En el tambor", cantidad: DOSIS.percarbonato[suciedad] });
         if (temp < 40) avisos.push("El percarbonato rinde mejor a partir de 40 °C.");
       }
@@ -538,6 +577,10 @@
         avisos.push("Las toallas sueltan pelusa y se pega a sintéticos y ropa oscura.");
       }
       if (fragil) avisos.push("Para lana o delicados el manual recomienda un detergente específico. Sin bicarbonato ni percarbonato: son alcalinos y pueden apelmazar la lana o apagar la seda.");
+      if (tiene("panosMicro")) {
+        avisos.push("Microfibra: sin bicarbonato, percarbonato ni lejía. Los fabricantes piden evitar productos muy alcalinos o blanqueantes.");
+        avisos.push("El Sanytol lleva sales de amonio, como los suavizantes. Si notas que la microfibra absorbe menos, no lo eches cuando laves solo microfibra.");
+      }
       if (prog === "oscura") avisos.push("El manual recomienda detergente líquido aquí. Con polvo pueden quedar marcas blancas; lava del revés.");
       if (tiene("deporte")) avisos.push("Nada de suavizante en la ropa de deporte (lo indica el manual).");
       if (prog === "rapido") avisos.push("Si activas SpeedPerfect baja a 15 min, pero la carga máxima pasa a 2 kg.");
@@ -568,6 +611,10 @@
       }
       if (tiene("camisas")) {
         consejos.push("Abrocha los botones y cuelga las camisas en percha nada más sacarlas.");
+      }
+      if (soloPanos) {
+        consejos.push("Sacude y aclara los paños antes de meterlos para quitar restos de comida y polvo.");
+        consejos.push("Tiéndelos al aire en cuanto acabe el lavado: si se quedan húmedos en el tambor, vuelven a oler.");
       }
 
       if (excede) {
@@ -629,6 +676,22 @@
         return;
       }
 
+      // Paños de limpieza + ropa → siempre en lavadoras separadas
+      const nombres = g => g.map(t => NOMBRE_TEJIDO[t]).join(", ");
+      const panos = entrada.tejidos.filter(t => PANOS.includes(t));
+      const ropa = entrada.tejidos.filter(t => !PANOS.includes(t));
+      if (panos.length && ropa.length) {
+        const rRopa = recomendar({ ...entrada, tejidos: ropa });
+        const rPanos = recomendar({ ...entrada, tejidos: panos, carga: "poca" });
+        resultado.innerHTML = `
+          <p class="aviso" style="margin:0 0 16px">Los paños de limpieza llevan grasa y restos: lávalos aparte de la ropa. Mejor en 2 lavadoras:</p>
+          ${tarjeta(rRopa, `Lavadora 1 · ${nombres(ropa)}`)}
+          <hr style="border:none;border-top:2px solid var(--borde);margin:24px 0">
+          ${tarjeta(rPanos, `Lavadora 2 · ${nombres(panos)}`)}
+        `;
+        return;
+      }
+
       const r = recomendar(entrada);
 
       // ¿No cabe todo en un programa? Separamos ropa resistente y ropa delicada en 2 lavadoras
@@ -637,7 +700,6 @@
       const grupo2 = entrada.tejidos.filter(t => !RESISTENTE.includes(t));
 
       if (r.excede && grupo1.length && grupo2.length) {
-        const nombres = g => g.map(t => NOMBRE_TEJIDO[t]).join(", ");
         // Cada tanda lleva aproximadamente la mitad: la tratamos como carga media
         const r1 = recomendar({ ...entrada, tejidos: grupo1, carga: "media" });
         const r2 = recomendar({ ...entrada, tejidos: grupo2, carga: "media" });
@@ -669,7 +731,7 @@
           <span class="contador">${esResultado ? "✓" : `${paso}/${PREGUNTAS}`}</span>
         </div>`);
 
-      // Botón "Atrás" grande abajo, al lado de "Siguiente" / "Nuevo lavado"
+      // Botón "Atrás" grande abajo, al lado de "Siguiente"
       // (en la primera pregunta no hace falta: no hay nada detrás)
       // (la pantalla de resultado no tiene botones abajo)
       const pie = pantalla.querySelector(".pie");
@@ -696,7 +758,7 @@
       const e = leerFormulario();
       const extras = [e.olor && "Mal olor", e.prisa && "Prisa"].filter(Boolean);
       const filas = [
-        { paso: 1, etiqueta: "Ropa",     valor: e.tejidos.map(t => NOMBRE_TEJIDO[t]).join(", ") },
+        { paso: 1, etiqueta: "Qué lavas", valor: e.tejidos.map(t => NOMBRE_TEJIDO[t]).join(", ") },
         { paso: 2, etiqueta: "Color",    valor: TEXTOS.color[e.color] },
         { paso: 3, etiqueta: "Suciedad", valor: TEXTOS.suciedad[e.suciedad] },
         { paso: 4, etiqueta: "Cantidad", valor: TEXTOS.carga[e.carga] },
@@ -770,6 +832,9 @@
     // Al marcar opciones solo se activa el botón "Siguiente": para avanzar hay que pulsarlo
     formulario.addEventListener("change", actualizarBotones);
 
+    // Al abrir la app, todo desmarcado (Chrome a veces recuerda lo último marcado)
+    formulario.reset();
+    window.addEventListener("pageshow", e => { if (e.persisted) { formulario.reset(); mostrar(0, false); } });
 
     history.replaceState({ paso: 0 }, "");
     actualizarBotones();
@@ -781,10 +846,13 @@
       navigator.serviceWorker.register("sw.js", { updateViaCache: "none" })
         .then(registro => registro.update());
 
-      // Cuando llega una versión nueva, recarga la app una vez para enseñarla
+      // Cuando llega una versión nueva, recarga la app una vez para enseñarla.
+      // Solo si ya había una versión antes y estás en la pantalla de inicio,
+      // para no borrar lo que estés marcando.
+      const habiaVersion = !!navigator.serviceWorker.controller;
       let recargada = false;
       navigator.serviceWorker.addEventListener("controllerchange", () => {
-        if (recargada) return;
+        if (!habiaVersion || recargada || pasoActual !== 0) return;
         recargada = true;
         location.reload();
       });

@@ -3,7 +3,7 @@
 // ⚠️ Cada vez que cambies algún archivo, sube el número de VERSION
 //    para que el móvil descargue la versión nueva.
 
-const VERSION = "lavadorapp-v14";
+const VERSION = "lavadorapp-v15";
 const ARCHIVOS = [
   "./",
   "./index.html",
@@ -43,8 +43,11 @@ self.addEventListener("fetch", (evento) => {
     // (si no, Chrome reutiliza su copia durante unos 10 minutos)
     fetch(evento.request, { cache: "no-cache" })
       .then((respuesta) => {
-        const copia = respuesta.clone();
-        caches.open(VERSION).then((cache) => cache.put(evento.request, copia));
+        // Solo guarda respuestas correctas (no páginas de error)
+        if (respuesta.ok) {
+          const copia = respuesta.clone();
+          caches.open(VERSION).then((cache) => cache.put(evento.request, copia));
+        }
         return respuesta;
       })
       .catch(() => caches.match(evento.request).then((r) => r || caches.match("./index.html")))
