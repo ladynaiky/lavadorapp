@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Fondo azul marino (ocupa todo: Android lo recorta en círculo o en cuadrado redondeado) -->
+  <rect width="512" height="512" fill="#0b1628"/>
+  <!-- Cuerpo de la lavadora -->
+  <rect x="136" y="116" width="240" height="280" rx="28" fill="#e6edf7"/>
+  <!-- Panel de mandos -->
+  <rect x="136" y="116" width="240" height="56" rx="28" fill="#c9d6e8"/>
+  <rect x="136" y="150" width="240" height="22" fill="#c9d6e8"/>
+  <circle cx="176" cy="144" r="11" fill="#f5a623"/>
+  <rect x="300" y="138" width="50" height="12" rx="6" fill="#93a4bd"/>
+  <!-- Puerta -->
+  <circle cx="256" cy="282" r="84" fill="#13233d"/>
+  <circle cx="256" cy="282" r="66" fill="#2f6fd6"/>
+  <!-- Agua (ola ámbar) -->
+  <clipPath id="ojo"><circle cx="256" cy="282" r="66"/></clipPath>
+  <path clip-path="url(#ojo)" fill="#f5a623"
+        d="M180 292 Q208 270 236 292 T292 292 T348 292 V360 H180 Z"/>
+</svg>

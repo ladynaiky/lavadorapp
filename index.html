@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1628">
+  <!-- App instalable: nombre, icono y colores -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icono-192.png">
+  <link rel="apple-touch-icon" href="icono-192.png">
+  <title>Lavadorapp</title>
+
+  <!-- ============================================================
+       PARTE 1 · CSS: el aspecto visual
+       ============================================================ -->
+  <style>
+    /* Modo oscuro azul: todos los colores salen de aquí */
+    :root {
+      color-scheme: dark;
+      --fondo: #0b1628;        /* azul noche */
+      --tarjeta: #13233d;      /* azul oscuro de las tarjetas */
+      --borde: #2a3d5c;
+      --texto: #e6edf7;
+      --suave: #93a4bd;
+      --acento: #5aa2f2;       /* azul claro para títulos */
+      --seleccion: #f5a623;          /* pastilla marcada: ámbar */
+      --texto-seleccion: #1a1205;    /* texto oscuro para que se lea bien sobre el ámbar */
+      --aviso: #33260f;
+      --aviso-borde: #e8962a;
+      --consejo: #142f52;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      background: var(--fondo);
+      color: var(--texto);
+    }
+    main { max-width: 480px; margin: 0 auto; padding: 16px; }
+    h1 { font-size: 1.4rem; margin: 8px 0 16px; }
+
+    fieldset {
+      border: none;
+      background: var(--tarjeta);
+      border-radius: 12px;
+      padding: 12px;
+      margin: 0 0 12px;
+    }
+    legend { font-weight: 600; padding: 0; margin-bottom: 8px; float: left; width: 100%; }
+    legend small { font-weight: 400; color: var(--suave); }
+
+    .opciones { display: flex; flex-wrap: wrap; gap: 8px; clear: both; }
+    .opciones label {
+      border: 1px solid var(--borde);
+      border-radius: 999px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+    .opciones input { position: absolute; opacity: 0; pointer-events: none; }
+    .opciones label:has(input:checked) {
+      background: var(--seleccion);
+      border-color: var(--seleccion);
+      color: var(--texto-seleccion);
+      font-weight: 600;
+    }
+    .opciones label:has(input:focus-visible) { outline: 2px solid var(--seleccion); outline-offset: 2px; }
+
+    #resultado { background: var(--tarjeta); border-radius: 12px; padding: 16px; }
+    #resultado h2 { margin: 0 0 4px; font-size: 1.3rem; color: var(--acento); }
+    .ajustes { color: var(--suave); margin: 0 0 12px; }
+    #resultado h3 { font-size: 1rem; margin: 16px 0 6px; }
+
+    /* Tabla de productos */
+    .productos { width: 100%; border-collapse: collapse; }
+    .productos td { padding: 8px 4px; border-top: 1px solid var(--borde); vertical-align: top; }
+    .productos .cantidad { font-weight: 700; white-space: nowrap; text-align: right; }
+    .productos .donde { display: block; color: var(--suave); font-size: 0.85rem; }
+
+    #resultado ul { margin: 0; padding: 0; list-style: none; }
+    #resultado li { margin-bottom: 4px; }
+    .aviso {
+      background: var(--aviso);
+      border-left: 4px solid var(--aviso-borde);
+      padding: 8px 10px;
+      border-radius: 6px;
+      margin-top: 8px;
+    }
+    .consejo {
+      background: var(--consejo);
+      border-left: 4px solid var(--acento);
+      padding: 8px 10px;
+      border-radius: 6px;
+      margin-top: 8px;
+    }
+    .nota { color: var(--suave); font-size: 0.85rem; margin-top: 12px; }
+    footer ul { padding-left: 18px; margin: 6px 0 0; }
+    footer { color: var(--suave); font-size: 0.85rem; margin: 16px 0 32px; }
+  </style>
+</head>
+
+<body>
+  <main>
+    <h1>👕 Lavadorapp</h1>
+
+    <!-- ============================================================
+         PARTE 2 · HTML: las preguntas
+         ============================================================ -->
+    <form id="formulario">
+      <fieldset>
+        <!-- Ahora son checkbox: se pueden marcar varios -->
+        <legend>¿Qué vas a lavar? <small>(marca todo lo que lleves)</small></legend>
+        <div class="opciones">
+          <label><input type="checkbox" name="tejido" value="algodon"> 👚 Algodón / lino</label>
+          <label><input type="checkbox" name="tejido" value="toallas"> 🛏️ Toallas y sábanas</label>
+          <label><input type="checkbox" name="tejido" value="sinteticos"> 🧥 Sintéticos</label>
+          <label><input type="checkbox" name="tejido" value="camisas"> 👔 Camisas / blusas</label>
+          <label><input type="checkbox" name="tejido" value="deporte"> 🎽 Ropa de deporte</label>
+          <label><input type="checkbox" name="tejido" value="vaqueros"> 👖 Vaqueros</label>
+          <label><input type="checkbox" name="tejido" value="delicado"> 👗 Delicado / seda</label>
+          <label><input type="checkbox" name="tejido" value="lana"> 🧣 Lana</label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Color</legend>
+        <div class="opciones">
+          <label><input type="radio" name="color" value="blanco"> Blanco</label>
+          <label><input type="radio" name="color" value="color"> Color</label>
+          <label><input type="radio" name="color" value="oscuro"> Oscuro</label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>¿Cómo de sucia está?</legend>
+        <div class="opciones">
+          <label><input type="radio" name="suciedad" value="ligera"> Ligera</label>
+          <label><input type="radio" name="suciedad" value="normal"> Normal</label>
+          <label><input type="radio" name="suciedad" value="intensa"> Mucho</label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>¿Cuánta ropa llevas? <small>(la lavadora llena son 9 kg)</small></legend>
+        <div class="opciones">
+          <label><input type="radio" name="carga" value="poca"> Poca (hasta 2 kg)</label>
+          <label><input type="radio" name="carga" value="media"> Media (2–4 kg)</label>
+          <label><input type="radio" name="carga" value="mucha"> Mucha (más de 4 kg)</label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Extras</legend>
+        <div class="opciones">
+          <label><input type="checkbox" name="olor"> Tiene mal olor</label>
+          <label><input type="checkbox" name="prisa"> Tengo prisa</label>
+        </div>
+      </fieldset>
+    </form>
+
+    <section id="resultado" aria-live="polite"></section>
+
+    <footer>
+      <strong>Preparado de ácido cítrico:</strong> disuelve 1 cucharada de ácido cítrico en 500 ml de agua y guárdalo en una botella etiquetada.
+      <br><br>
+      <strong>Siempre:</strong>
+      <ul>
+        <li>Deja un palmo libre entre la ropa y la parte de arriba del tambor.</li>
+        <li>Separa blancos y colores. Calcetines y ropa interior, en bolsa de malla.</li>
+        <li>Vacía los bolsillos y cierra cremalleras.</li>
+        <li>Saca la ropa en cuanto acabe. Si no vas a estar, usa «Termin.» (fin diferido).</li>
+        <li>Al terminar, deja la puerta y el cajetín abiertos para que se sequen.</li>
+        <li>Si lavas casi siempre a 40 °C o menos, pon de vez en cuando <strong>Limpieza tambor</strong> sin ropa, con media dosis de detergente en polvo y sin suavizante.</li>
+        <li>Limpia de vez en cuando el filtro de desagüe, la goma de la puerta y el cajetín.</li>
+      </ul>
+    </footer>
+  </main>
+
+  <!-- ============================================================
+       PARTE 3 · JAVASCRIPT: la lógica
+       ============================================================ -->
+  <script>
+    // ---------- 3.1 DATOS: los programas de tu Bosch (sacados del manual) ----------
+    const PROGRAMAS = {
+      algodon:    { nombre: "Algodón",          cargaMax: 9, tempMax: 90, centrifMax: 1200 },
+      sinteticos: { nombre: "Sintéticos",       cargaMax: 4, tempMax: 60, centrifMax: 1200 },
+      mix:        { nombre: "Mix",              cargaMax: 4, tempMax: 60, centrifMax: 1200 },
+      camisas:    { nombre: "Camisas/Blusas",   cargaMax: 2, tempMax: 60, centrifMax: 800  },
+      sport:      { nombre: "Sport",            cargaMax: 2, tempMax: 40, centrifMax: 800  },
+      oscura:     { nombre: "Ropa oscura",      cargaMax: 4, tempMax: 40, centrifMax: 1200 },
+      delicado:   { nombre: "Delicado/Seda",    cargaMax: 2, tempMax: 40, centrifMax: 800  },
+      lana:       { nombre: "Lana",             cargaMax: 2, tempMax: 40, centrifMax: 800  },
+      rapido:     { nombre: "Rápido 15/30 min", cargaMax: 4, tempMax: 40, centrifMax: 1200 },
+    };
+
+    // Temperatura sugerida según suciedad (0 = frío)
+    const TEMPERATURAS = {
+      algodon:    { ligera: 30, normal: 40, intensa: 60 },
+      sinteticos: { ligera: 30, normal: 40, intensa: 40 },
+      mix:        { ligera: 30, normal: 30, intensa: 40 },
+      camisas:    { ligera: 30, normal: 40, intensa: 40 },
+      sport:      { ligera: 30, normal: 30, intensa: 40 },
+      oscura:     { ligera: 30, normal: 30, intensa: 40 },
+      delicado:   { ligera: 0,  normal: 30, intensa: 30 },
+      lana:       { ligera: 0,  normal: 30, intensa: 30 },
+      rapido:     { ligera: 30, normal: 30, intensa: 30 },
+    };
+
+    // Cuando mezclas ropa, gana el programa MÁS SUAVE (el primero de esta lista)
+    const ORDEN_SUAVIDAD = ["lana", "delicado", "camisas", "sport", "oscura", "mix", "sinteticos", "algodon"];
+
+    // Centrifugado recomendado por tipo de ropa (rpm).
+    // Si mezclas, gana el más bajo para no dañar la prenda más delicada.
+    // Centrifugado recomendado por tipo de ropa (rpm) y por qué
+    const CENTRIFUGADO = {
+      toallas:    { rpm: 1200, motivo: "las toallas escurren mucho y no se arrugan" },
+      algodon:    { rpm: 1000, motivo: "seca bien con menos arrugas que a 1200" },
+      sinteticos: { rpm:  800, motivo: "los sintéticos se arrugan con facilidad y secan solos" },
+      deporte:    { rpm:  800, motivo: "protege los tejidos técnicos y elásticos" },
+      vaqueros:   { rpm:  800, motivo: "menos marcas y menos desgaste del color" },
+      camisas:    { rpm:  600, motivo: "casi sin arrugas, para planchar menos" },
+      delicado:   { rpm:  600, motivo: "protege las fibras finas" },
+      lana:       { rpm:  400, motivo: "la lana pide el centrifugado más bajo posible para no deformarse" },
+    };
+
+    // ---------- 3.2 CANTIDADES: para una carga normal (4–5 kg) ----------
+    // Sanytol: confirmado por la etiqueta (1 tapón = 40 ml).
+    // Elena: el paquete de 1350 g da 27 lavados → 1 cacito ≈ 50 g por lavado.
+    // ⚠️ Elena "ligera" e "intensa" son PROVISIONALES hasta ver la tabla del envase.
+    const DOSIS = {
+      detergente:   { ligera: "¾ cacito (≈ 40 g)", normal: "1 cacito (≈ 50 g)", intensa: "1½ cacitos (≈ 75 g)" },
+      bicarbonato:  { ligera: "1 cucharada",       normal: "1 cucharada",       intensa: "2 cucharadas" },
+      percarbonato: { ligera: "1 cucharada",       normal: "1 cucharada",       intensa: "2 cucharadas" },
+      bicarbonatoOlor: "2 cucharadas",   // si marcas "Tiene mal olor"
+      // Preparado de ácido cítrico: 1 cucharada disuelta en 500 ml de agua
+      acidoCitrico:      "100 ml",
+      acidoCitricoSuave: "50 ml",   // lana y delicados: dosis baja
+      sanytol:      "1 tapón (40 ml)",
+    };
+
+    // Kilos aproximados de cada respuesta de "¿Cuánta ropa llevas?"
+    const KILOS = { poca: 2, media: 4, mucha: 9 };
+
+    // Si la ropa no cabe en un programa, este es el siguiente que la admite
+    // (Sport → Sintéticos lo sugiere el propio manual para cargas más grandes)
+    const SUSTITUTO = { sport: "sinteticos", camisas: "mix", oscura: "algodon" };
+
+    // Nombres para mostrar
+    const NOMBRE_TEJIDO = {
+      algodon: "algodón", toallas: "toallas", sinteticos: "sintéticos", camisas: "camisas",
+      deporte: "deporte", vaqueros: "vaqueros", delicado: "delicados", lana: "lana",
+    };
+
+    // ---------- 3.3 LÓGICA ----------
+
+    // a) Programa ideal para UN tipo de ropa
+    function programaDe(tejido, suciedad) {
+      switch (tejido) {
+        case "algodon":
+        case "toallas":    return "algodon";
+        case "sinteticos": return "sinteticos";
+        case "camisas":    return "camisas";
+        case "deporte":    return suciedad === "intensa" ? "sinteticos" : "sport";
+        case "vaqueros":   return "oscura";
+        case "delicado":   return "delicado";
+        case "lana":       return "lana";
+      }
+    }
+
+    // b) Programa para VARIOS tipos de ropa juntos
+    function combinarProgramas(lista, suciedad) {
+      const distintos = [...new Set(lista)];          // quita repetidos
+      if (distintos.length === 1) return distintos[0];
+
+      // Algodón + sintéticos juntos → Mix (o Sintéticos si está muy sucia)
+      const resistentes = ["algodon", "sinteticos", "mix"];
+      if (distintos.every(p => resistentes.includes(p))) {
+        return suciedad === "intensa" ? "sinteticos" : "mix";
+      }
+      // Si no, el más suave de todos
+      return ORDEN_SUAVIDAD.find(p => distintos.includes(p));
+    }
+
+    function recomendar({ tejidos, color, suciedad, olor, prisa, carga }) {
+      const opciones = [];
+      const productos = [];
+      const avisos = [];
+      const consejos = [];
+      const tiene = t => tejidos.includes(t);
+
+      // 1. Programa
+      let prog = combinarProgramas(tejidos.map(t => programaDe(t, suciedad)), suciedad);
+      const resistente = ["algodon", "sinteticos", "mix"].includes(prog);
+      if (color === "oscuro" && resistente) prog = "oscura";
+      if (prisa && suciedad === "ligera" && resistente && carga !== "mucha") prog = "rapido";
+
+      // 1b. ¿Cabe la ropa? Si no, pasamos a un programa con más capacidad
+      const kilos = KILOS[carga];
+      const progInicial = prog;
+      while (PROGRAMAS[prog].cargaMax < kilos && SUSTITUTO[prog]) {
+        // Ropa oscura → Algodón solo si todo es ropa resistente de algodón
+        if (prog === "oscura" && !tejidos.every(t => ["algodon", "toallas", "vaqueros"].includes(t))) break;
+        prog = SUSTITUTO[prog];
+      }
+      if (prog !== progInicial) {
+        avisos.push(`Con tanta ropa no cabe en ${PROGRAMAS[progInicial].nombre} (máx. ${PROGRAMAS[progInicial].cargaMax} kg): uso ${PROGRAMAS[prog].nombre}, que admite ${PROGRAMAS[prog].cargaMax} kg.`);
+      }
+      const excede = PROGRAMAS[prog].cargaMax < kilos;
+
+      // 2. Temperatura
+      let temp = TEMPERATURAS[prog][suciedad];
+      const soloToallas = tejidos.length === 1 && tiene("toallas");
+      if (soloToallas && prog === "algodon") temp = 60;
+      if (color === "oscuro") temp = Math.min(temp, 40);
+      if (tiene("vaqueros") || tiene("deporte")) temp = Math.min(temp, 40);  // a 60 °C encogen o se dañan
+      temp = Math.min(temp, PROGRAMAS[prog].tempMax);
+
+      // 2b. Centrifugado: manda la prenda que pide menos vueltas
+      const limita = tejidos.reduce((a, b) => CENTRIFUGADO[b].rpm < CENTRIFUGADO[a].rpm ? b : a);
+      let rpm = CENTRIFUGADO[limita].rpm;
+      let rpmMotivo = CENTRIFUGADO[limita].motivo;
+      if (tejidos.length > 1 && tejidos.some(t => CENTRIFUGADO[t].rpm > rpm)) {
+        rpmMotivo += " (manda la prenda más delicada de la mezcla)";
+      }
+      if (rpm > PROGRAMAS[prog].centrifMax) {
+        rpm = PROGRAMAS[prog].centrifMax;
+        rpmMotivo = `es lo máximo que permite el programa ${PROGRAMAS[prog].nombre}`;
+      }
+
+      // 3. Opciones de la lavadora
+      if (prog === "algodon" && suciedad === "intensa") opciones.push("Prelavado");
+      if (prog === "camisas") opciones.push("Fácil plancha (cuélgalas aún mojadas)");
+
+      // 4. Productos con cantidades
+      const fragil = tiene("delicado") || tiene("lana");
+      // La ropa de deporte necesita menos detergente: el exceso se queda en el tejido y guarda el olor
+      // La dosis también se ajusta a la cantidad de ropa: poca → un punto menos, mucha → un punto más
+      const soloDeporte = tejidos.every(t => t === "deporte");
+      const NIVELES = ["ligera", "normal", "intensa"];
+      let nivel = NIVELES.indexOf(suciedad);
+      if (carga === "poca") nivel--;
+      if (carga === "mucha") nivel++;
+      if (soloDeporte) nivel--;
+      nivel = Math.max(0, Math.min(2, nivel));
+      productos.push({
+        nombre: "Detergente Elena",
+        donde: soloDeporte ? "Cajetín II · menos cantidad: en ropa técnica el exceso se queda en el tejido" : "Cajetín II",
+        cantidad: DOSIS.detergente[NIVELES[nivel]],
+      });
+
+      // Bicarbonato solo donde más aporta (nunca en lana ni delicados)
+      let paraQue = null;
+      if (olor)                                             paraQue = "quita el mal olor";
+      else if (tiene("deporte"))                            paraQue = "neutraliza el olor a sudor";
+      else if (tiene("toallas"))                            paraQue = "evita el olor a humedad de las toallas";
+      // En ropa blanca no hace falta: el percarbonato ya hace ese trabajo y mejor
+
+      if (!fragil && paraQue) {
+        const cantidadBicarbonato = olor ? DOSIS.bicarbonatoOlor : DOSIS.bicarbonato[suciedad];
+        productos.push({ nombre: "Bicarbonato", donde: `En el tambor, antes de la ropa · ${paraQue}`, cantidad: cantidadBicarbonato });
+      }
+      if (!fragil && color === "blanco" && suciedad !== "ligera") {
+        productos.push({ nombre: "Percarbonato", donde: "En el tambor", cantidad: DOSIS.percarbonato[suciedad] });
+        if (temp < 40) avisos.push("El percarbonato rinde mejor a partir de 40 °C.");
+      }
+      // Sanytol y ácido cítrico van juntos en cada lavado, en el cajetín del suavizante
+      productos.push({ nombre: "Sanytol", donde: "Cajetín del suavizante", cantidad: DOSIS.sanytol });
+      productos.push({
+        nombre: "Preparado de ácido cítrico",
+        donde: "Cajetín del suavizante, junto al Sanytol",
+        cantidad: fragil ? DOSIS.acidoCitricoSuave : DOSIS.acidoCitrico,
+      });
+      avisos.push("Sanytol y ácido cítrico comparten cajetín: entre los dos no pases la marca MAX. Si no cabe, reduce el ácido cítrico.");
+
+      // 5. Avisos
+      const gruesa = tiene("algodon") || tiene("toallas") || tiene("vaqueros");
+      if (fragil && gruesa) {
+        avisos.push(`Mezclas ropa delicada con ropa gruesa: todo irá en ${PROGRAMAS[prog].nombre} y la gruesa quedará menos limpia. Mejor sepáralas.`);
+      }
+      if (tiene("toallas") && (tiene("sinteticos") || tiene("deporte") || color === "oscuro")) {
+        avisos.push("Las toallas sueltan pelusa y se pega a sintéticos y ropa oscura.");
+      }
+      if (fragil) avisos.push("Para lana o delicados el manual recomienda un detergente específico. Sin bicarbonato ni percarbonato: son alcalinos y pueden apelmazar la lana o apagar la seda.");
+      if (prog === "oscura") avisos.push("El manual recomienda detergente líquido aquí. Con polvo pueden quedar marcas blancas; lava del revés.");
+      if (tiene("deporte")) avisos.push("Nada de suavizante en la ropa de deporte (lo indica el manual).");
+      if (prog === "rapido") avisos.push("Si activas SpeedPerfect baja a 15 min, pero la carga máxima pasa a 2 kg.");
+      if (productos.some(p => p.nombre === "Bicarbonato")) {
+        avisos.push("Bicarbonato y ácido cítrico se anulan si coinciden. Así van en fases distintas (lavado y aclarado), no los juntes en el mismo cajetín.");
+      }
+
+      // 6. Consejos de cuidado según lo que lleves
+      if (suciedad === "intensa") consejos.push("Trata las manchas antes de lavar con un poco de detergente o quitamanchas, sin frotar.");
+      if (tiene("toallas")) {
+        consejos.push("Lo ideal es lavar las toallas solas: sueltan pelusa y así se reparten mejor el agua y el detergente.");
+        consejos.push("Tiéndelas en un sitio ventilado. Si quedan ásperas por la cal, el ácido cítrico ayuda a dejarlas suaves sin restar absorción.");
+      }
+      if (tiene("deporte")) {
+        consejos.push("Lava la ropa de deporte del revés: la suciedad y el sudor se acumulan por dentro.");
+        consejos.push("Tiéndela al aire en cuanto acabe el lavado. Nada de secadora caliente.");
+      }
+      if (tiene("vaqueros")) {
+        consejos.push("Vaqueros del revés y con botones y cremalleras cerrados.");
+        consejos.push("No hace falta lavarlos cada vez: cada 5 o 6 usos, aireándolos entre medias.");
+        consejos.push("Sécalos a la sombra para que no pierdan color. Si son nuevos, lávalos solos o con otros oscuros.");
+      }
+      if (tiene("lana")) {
+        consejos.push("No retuerzas la lana: escúrrela presionando, enróllala en una toalla y sécala en horizontal.");
+      }
+      if (tiene("delicado")) {
+        consejos.push("Mete las prendas delicadas o con ganchos y corchetes en una bolsa de malla.");
+      }
+      if (tiene("camisas")) {
+        consejos.push("Abrocha los botones y cuelga las camisas en percha nada más sacarlas.");
+      }
+
+      if (excede) {
+        avisos.unshift(`${PROGRAMAS[prog].nombre} admite como mucho ${PROGRAMAS[prog].cargaMax} kg: si llevas más, hazlo en dos tandas.`);
+      }
+
+      return { prog, temp, rpm, rpmMotivo, opciones, productos, avisos, consejos, excede };
+    }
+
+    // ---------- 3.4 PANTALLA ----------
+    const formulario = document.getElementById("formulario");
+    const resultado = document.getElementById("resultado");
+
+    function leerFormulario() {
+      const datos = new FormData(formulario);
+      return {
+        tejidos: datos.getAll("tejido"),   // getAll → lista con todos los marcados
+        color: datos.get("color"),
+        suciedad: datos.get("suciedad"),
+        carga: datos.get("carga"),
+        olor: datos.has("olor"),
+        prisa: datos.has("prisa"),
+      };
+    }
+
+    // Dibuja la tarjeta de UN lavado
+    function tarjeta(r, titulo = "") {
+      const p = PROGRAMAS[r.prog];
+      const tempTexto = r.temp === 0 ? "Frío" : `${r.temp} °C`;
+      const filas = r.productos.map(prod => `
+        <tr>
+          <td>${prod.nombre}<span class="donde">${prod.donde}</span></td>
+          <td class="cantidad">${prod.cantidad}</td>
+        </tr>`).join("");
+
+      return `
+        ${titulo ? `<p class="ajustes" style="margin:0 0 4px">${titulo}</p>` : ""}
+        <h2>${p.nombre}</h2>
+        <p class="ajustes">${tempTexto} · ${r.rpm} rpm · máx. ${p.cargaMax} kg</p>
+        <h3>Centrifugado: ${r.rpm} rpm</h3>
+        <p class="nota" style="margin-top:0">Pulsa «Centrif.» hasta que ponga ${r.rpm}: ${r.rpmMotivo}.</p>
+        ${r.opciones.length ? "<h3>Activa</h3><ul>" + r.opciones.map(o => `<li>• ${o}</li>`).join("") + "</ul>" : ""}
+        <h3>Productos</h3>
+        <table class="productos">${filas}</table>
+        <p class="nota">Cantidades ajustadas a la ropa que llevas.</p>
+        ${r.avisos.length ? "<h3>Ojo</h3><ul>" + r.avisos.map(a => `<li class="aviso">${a}</li>`).join("") + "</ul>" : ""}
+        ${r.consejos.length ? "<h3>Consejos</h3><ul>" + r.consejos.map(c => `<li class="consejo">${c}</li>`).join("") + "</ul>" : ""}
+      `;
+    }
+
+    function actualizar() {
+      const entrada = leerFormulario();
+
+      // Hasta que no estén las tres respuestas, decimos qué falta
+      const falta = [];
+      if (entrada.tejidos.length === 0) falta.push("qué vas a lavar");
+      if (!entrada.color) falta.push("el color");
+      if (!entrada.suciedad) falta.push("cuánta suciedad tiene");
+      if (!entrada.carga) falta.push("cuánta ropa llevas");
+      if (falta.length) {
+        resultado.innerHTML = `<p class="nota" style="margin:0">Para ver tu lavado, marca ${falta.join(", ").replace(/, ([^,]*)$/, " y $1")}.</p>`;
+        return;
+      }
+
+      const r = recomendar(entrada);
+
+      // ¿No cabe todo en un programa? Separamos ropa resistente y ropa delicada en 2 lavadoras
+      const RESISTENTE = ["algodon", "toallas", "vaqueros"];
+      const grupo1 = entrada.tejidos.filter(t => RESISTENTE.includes(t));
+      const grupo2 = entrada.tejidos.filter(t => !RESISTENTE.includes(t));
+
+      if (r.excede && grupo1.length && grupo2.length) {
+        const nombres = g => g.map(t => NOMBRE_TEJIDO[t]).join(", ");
+        // Cada tanda lleva aproximadamente la mitad: la tratamos como carga media
+        const r1 = recomendar({ ...entrada, tejidos: grupo1, carga: "media" });
+        const r2 = recomendar({ ...entrada, tejidos: grupo2, carga: "media" });
+        resultado.innerHTML = `
+          <p class="aviso" style="margin:0 0 16px">Todo junto no cabe en ningún programa que cuide bien cada prenda. Mejor en 2 lavadoras:</p>
+          ${tarjeta(r1, `Lavadora 1 · ${nombres(grupo1)}`)}
+          <hr style="border:none;border-top:2px solid var(--borde);margin:24px 0">
+          ${tarjeta(r2, `Lavadora 2 · ${nombres(grupo2)}`)}
+        `;
+        return;
+      }
+
+      resultado.innerHTML = tarjeta(r);
+    }
+
+    formulario.addEventListener("change", actualizar);
+    actualizar();
+
+    // ---------- 3.5 APP INSTALABLE ----------
+    // Registra el service worker (sw.js) para que la app funcione sin internet
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("sw.js");
+    }
+  </script>
+</body>
+</html>
