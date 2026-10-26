@@ -777,7 +777,17 @@
     // ---------- 3.6 APP INSTALABLE ----------
     // Registra el service worker (sw.js) para que la app funcione sin internet
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("sw.js");
+      // updateViaCache: "none" → busca siempre la versión nueva de sw.js en internet
+      navigator.serviceWorker.register("sw.js", { updateViaCache: "none" })
+        .then(registro => registro.update());
+
+      // Cuando llega una versión nueva, recarga la app una vez para enseñarla
+      let recargada = false;
+      navigator.serviceWorker.addEventListener("controllerchange", () => {
+        if (recargada) return;
+        recargada = true;
+        location.reload();
+      });
     }
   </script>
 </body>
