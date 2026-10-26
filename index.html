@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0b1628">
+  <meta name="description" content="Facilidad en cada lavado">
   <!-- App instalable: nombre, icono y colores -->
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icono-192.png">
@@ -96,21 +97,129 @@
     .nota { color: var(--suave); font-size: 0.85rem; margin-top: 12px; }
     footer ul { padding-left: 18px; margin: 6px 0 0; }
     footer { color: var(--suave); font-size: 0.85rem; margin: 16px 0 32px; }
+
+    /* ====== PANTALLAS (una pregunta por pantalla) ====== */
+    main { padding: 0 16px; }
+    .pantalla {
+      display: none;
+      flex-direction: column;
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding: 12px 0 0;
+    }
+    .pantalla.activa { display: flex; animation: entrar 0.25s ease-out; }
+    @keyframes entrar { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: none; } }
+
+    /* Pantalla de inicio */
+    .inicio { justify-content: center; align-items: center; text-align: center; }
+    .inicio .logo { display: block; overflow: hidden; width: 160px; height: 160px; border-radius: 36px; }
+    .inicio h1 { font-size: 2rem; margin: 24px 0 8px; }
+    .inicio p { color: var(--suave); margin: 0 0 40px; }
+    .inicio .boton-principal { width: 100%; max-width: 320px; }
+
+    /* Cabecera: botón atrás + barra de progreso */
+    .cabecera { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+    .atras {
+      width: 40px; height: 40px; flex: none;
+      border-radius: 50%; border: 1px solid var(--borde);
+      background: var(--tarjeta); color: var(--texto);
+      font-size: 1.2rem; cursor: pointer;
+    }
+    .progreso { flex: 1; height: 6px; background: var(--tarjeta); border-radius: 999px; overflow: hidden; }
+    .progreso span { display: block; height: 100%; background: var(--seleccion); border-radius: 999px; transition: width 0.3s; }
+    .contador { color: var(--suave); font-size: 0.85rem; min-width: 32px; text-align: right; }
+
+    .pregunta { font-size: 1.6rem; margin: 0 0 6px; }
+    .ayuda { color: var(--suave); margin: 0 0 20px; }
+
+    /* Opciones grandes, fáciles de pulsar con el dedo */
+    .opciones.lista { flex-direction: column; }
+    .opciones.rejilla { display: grid; grid-template-columns: 1fr 1fr; }
+    .opciones.lista label, .opciones.rejilla label {
+      border-radius: 14px;
+      padding: 16px;
+      font-size: 1.05rem;
+      background: var(--tarjeta);
+    }
+    .opciones label small { display: block; color: var(--suave); font-size: 0.85rem; margin-top: 2px; font-weight: 400; }
+    .opciones label:has(input:checked) small { color: var(--texto-seleccion); opacity: 0.8; }
+
+    /* Botón de abajo */
+    .pie {
+      margin-top: auto;
+      position: sticky; bottom: 0;
+      padding: 24px 0 20px;
+      background: linear-gradient(transparent, var(--fondo) 35%);
+    }
+    .boton-principal {
+      display: block; width: 100%;
+      padding: 16px;
+      border: none; border-radius: 14px;
+      background: var(--seleccion); color: var(--texto-seleccion);
+      font-size: 1.1rem; font-weight: 700;
+      cursor: pointer;
+    }
+    .boton-principal:disabled { background: var(--tarjeta); color: var(--suave); cursor: default; }
+    .boton-secundario {
+      display: block; width: 100%; margin-top: 10px;
+      padding: 14px; border-radius: 14px;
+      border: 1px solid var(--borde); background: transparent; color: var(--texto);
+      font-size: 1rem; cursor: pointer;
+    }
+
+    /* Botones de abajo en fila: [Atrás] [Siguiente] */
+    .pie-fila { display: flex; gap: 10px; }
+    .pie-fila .boton-secundario { width: auto; height: auto; margin: 0; flex: none; padding: 16px 18px; border-radius: 14px; font-size: 1rem; }
+    .pie-fila .boton-principal { flex: 1; }
+
+    /* Resumen de respuestas en la pantalla final */
+    .resumen { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+    .resumen button {
+      display: flex; justify-content: space-between; align-items: center; gap: 12px;
+      width: 100%; padding: 12px 14px; text-align: left;
+      background: var(--tarjeta); color: var(--texto);
+      border: 1px solid var(--borde); border-radius: 12px;
+      font-size: 0.95rem; cursor: pointer;
+    }
+    .resumen .etiqueta { color: var(--suave); font-size: 0.8rem; display: block; }
+    .resumen .editar { color: var(--seleccion); font-size: 0.85rem; white-space: nowrap; }
   </style>
 </head>
 
 <body>
   <main>
-    <h1>👕 Lavadorapp</h1>
-
     <!-- ============================================================
-         PARTE 2 · HTML: las preguntas
+         PARTE 2 · HTML: las pantallas
+         Cada <section class="pantalla"> es una pantalla.
+         Solo se ve la que tiene la clase "activa".
          ============================================================ -->
+
+    <!-- PANTALLA 0 · Inicio -->
+    <section class="pantalla inicio activa">
+      <svg class="logo" role="img" aria-label="Lavadorapp" xmlns="http://www.w3.org/2000/svg" viewBox="96 96 320 320">
+  <rect width="512" height="512" fill="#0b1628"/>
+  <rect x="136" y="116" width="240" height="280" rx="28" fill="#e6edf7"/>
+  <rect x="136" y="116" width="240" height="56" rx="28" fill="#c9d6e8"/>
+  <rect x="136" y="150" width="240" height="22" fill="#c9d6e8"/>
+  <circle cx="176" cy="144" r="11" fill="#f5a623"/>
+  <rect x="300" y="138" width="50" height="12" rx="6" fill="#93a4bd"/>
+  <circle cx="256" cy="282" r="84" fill="#13233d"/>
+  <circle cx="256" cy="282" r="66" fill="#2f6fd6"/>
+  <clipPath id="ojo"><circle cx="256" cy="282" r="66"/></clipPath>
+  <path clip-path="url(#ojo)" fill="#f5a623"
+        d="M180 292 Q208 270 236 292 T292 292 T348 292 V360 H180 Z"/>
+</svg>
+      <h1>Lavadorapp</h1>
+      <p>Facilidad en cada lavado</p>
+      <button type="button" class="boton-principal siguiente">Empezar</button>
+    </section>
+
     <form id="formulario">
-      <fieldset>
-        <!-- Ahora son checkbox: se pueden marcar varios -->
-        <legend>¿Qué vas a lavar? <small>(marca todo lo que lleves)</small></legend>
-        <div class="opciones">
+      <!-- PANTALLA 1 · Tipo de ropa (se pueden marcar varias) -->
+      <section class="pantalla" data-campo="tejido">
+        <h2 class="pregunta">¿Qué vas a lavar?</h2>
+        <p class="ayuda">Marca todo lo que lleves</p>
+        <div class="opciones rejilla">
           <label><input type="checkbox" name="tejido" value="algodon"> 👚 Algodón / lino</label>
           <label><input type="checkbox" name="tejido" value="toallas"> 🛏️ Toallas y sábanas</label>
           <label><input type="checkbox" name="tejido" value="sinteticos"> 🧥 Sintéticos</label>
@@ -120,60 +229,79 @@
           <label><input type="checkbox" name="tejido" value="delicado"> 👗 Delicado / seda</label>
           <label><input type="checkbox" name="tejido" value="lana"> 🧣 Lana</label>
         </div>
-      </fieldset>
+        <div class="pie"><button type="button" class="boton-principal siguiente">Siguiente</button></div>
+      </section>
 
-      <fieldset>
-        <legend>Color</legend>
-        <div class="opciones">
-          <label><input type="radio" name="color" value="blanco"> Blanco</label>
-          <label><input type="radio" name="color" value="color"> Color</label>
-          <label><input type="radio" name="color" value="oscuro"> Oscuro</label>
+      <!-- PANTALLA 2 · Color -->
+      <section class="pantalla" data-campo="color">
+        <h2 class="pregunta">¿De qué color es?</h2>
+        <p class="ayuda">Elige una opción</p>
+        <div class="opciones lista">
+          <label><input type="radio" name="color" value="blanco"> ⚪ Blanco</label>
+          <label><input type="radio" name="color" value="color"> 🎨 Color</label>
+          <label><input type="radio" name="color" value="oscuro"> ⚫ Oscuro</label>
         </div>
-      </fieldset>
+        <div class="pie"><button type="button" class="boton-principal siguiente">Siguiente</button></div>
+      </section>
 
-      <fieldset>
-        <legend>¿Cómo de sucia está?</legend>
-        <div class="opciones">
-          <label><input type="radio" name="suciedad" value="ligera"> Ligera</label>
-          <label><input type="radio" name="suciedad" value="normal"> Normal</label>
-          <label><input type="radio" name="suciedad" value="intensa"> Mucho</label>
+      <!-- PANTALLA 3 · Suciedad -->
+      <section class="pantalla" data-campo="suciedad">
+        <h2 class="pregunta">¿Cómo de sucia está?</h2>
+        <p class="ayuda">Elige una opción</p>
+        <div class="opciones lista">
+          <label><input type="radio" name="suciedad" value="ligera"> Ligera <small>Sin manchas, solo usada o con olor</small></label>
+          <label><input type="radio" name="suciedad" value="normal"> Normal <small>Algo de sudor o manchas leves</small></label>
+          <label><input type="radio" name="suciedad" value="intensa"> Mucho <small>Manchas visibles, ropa de trabajo o trapos</small></label>
         </div>
-      </fieldset>
+        <div class="pie"><button type="button" class="boton-principal siguiente">Siguiente</button></div>
+      </section>
 
-      <fieldset>
-        <legend>¿Cuánta ropa llevas? <small>(la lavadora llena son 9 kg)</small></legend>
-        <div class="opciones">
-          <label><input type="radio" name="carga" value="poca"> Poca (hasta 2 kg)</label>
-          <label><input type="radio" name="carga" value="media"> Media (2–4 kg)</label>
-          <label><input type="radio" name="carga" value="mucha"> Mucha (más de 4 kg)</label>
+      <!-- PANTALLA 4 · Cantidad de ropa -->
+      <section class="pantalla" data-campo="carga">
+        <h2 class="pregunta">¿Cuánta ropa llevas?</h2>
+        <p class="ayuda">La lavadora llena son 9 kg</p>
+        <div class="opciones lista">
+          <label><input type="radio" name="carga" value="poca"> Poca <small>Hasta 2 kg · un cuarto de tambor</small></label>
+          <label><input type="radio" name="carga" value="media"> Media <small>2–4 kg · medio tambor</small></label>
+          <label><input type="radio" name="carga" value="mucha"> Mucha <small>Más de 4 kg · tambor casi lleno</small></label>
         </div>
-      </fieldset>
+        <div class="pie"><button type="button" class="boton-principal siguiente">Siguiente</button></div>
+      </section>
 
-      <fieldset>
-        <legend>Extras</legend>
-        <div class="opciones">
-          <label><input type="checkbox" name="olor"> Tiene mal olor</label>
-          <label><input type="checkbox" name="prisa"> Tengo prisa</label>
+      <!-- PANTALLA 5 · Extras (opcional) -->
+      <section class="pantalla" data-campo="extras">
+        <h2 class="pregunta">¿Algo más?</h2>
+        <p class="ayuda">Opcional: marca lo que corresponda</p>
+        <div class="opciones lista">
+          <label><input type="checkbox" name="olor"> 👃 Tiene mal olor</label>
+          <label><input type="checkbox" name="prisa"> ⏱️ Tengo prisa</label>
         </div>
-      </fieldset>
+        <div class="pie"><button type="button" class="boton-principal siguiente">Ver mi lavado</button></div>
+      </section>
     </form>
 
-    <section id="resultado" aria-live="polite"></section>
+    <!-- PANTALLA 6 · Resultado -->
+    <section class="pantalla" data-campo="resultado">
+      <h2 class="pregunta">Tu lavado</h2>
+      <p class="ayuda" style="margin-bottom:10px">Toca una respuesta para cambiarla</p>
+      <div class="resumen" id="resumen"></div>
+      <section id="resultado" aria-live="polite"></section>
 
-    <footer>
-      <strong>Preparado de ácido cítrico:</strong> disuelve 1 cucharada de ácido cítrico en 500 ml de agua y guárdalo en una botella etiquetada.
-      <br><br>
-      <strong>Siempre:</strong>
-      <ul>
-        <li>Deja un palmo libre entre la ropa y la parte de arriba del tambor.</li>
-        <li>Separa blancos y colores. Calcetines y ropa interior, en bolsa de malla.</li>
-        <li>Vacía los bolsillos y cierra cremalleras.</li>
-        <li>Saca la ropa en cuanto acabe. Si no vas a estar, usa «Termin.» (fin diferido).</li>
-        <li>Al terminar, deja la puerta y el cajetín abiertos para que se sequen.</li>
-        <li>Si lavas casi siempre a 40 °C o menos, pon de vez en cuando <strong>Limpieza tambor</strong> sin ropa, con media dosis de detergente en polvo y sin suavizante.</li>
-        <li>Limpia de vez en cuando el filtro de desagüe, la goma de la puerta y el cajetín.</li>
-      </ul>
-    </footer>
+      <footer>
+        <strong>Preparado de ácido cítrico:</strong> disuelve 1 cucharada de ácido cítrico en 500 ml de agua y guárdalo en una botella etiquetada.
+        <br><br>
+        <strong>Siempre:</strong>
+        <ul>
+          <li>Deja un palmo libre entre la ropa y la parte de arriba del tambor.</li>
+          <li>Separa blancos y colores. Calcetines y ropa interior, en bolsa de malla.</li>
+          <li>Vacía los bolsillos y cierra cremalleras.</li>
+          <li>Saca la ropa en cuanto acabe. Si no vas a estar, usa «Termin.» (fin diferido).</li>
+          <li>Al terminar, deja la puerta y el cajetín abiertos para que se sequen.</li>
+          <li>Si lavas casi siempre a 40 °C o menos, pon de vez en cuando <strong>Limpieza tambor</strong> sin ropa, con media dosis de detergente en polvo y sin suavizante.</li>
+          <li>Limpia de vez en cuando el filtro de desagüe, la goma de la puerta y el cajetín.</li>
+        </ul>
+      </footer>
+    </section>
   </main>
 
   <!-- ============================================================
@@ -309,11 +437,29 @@
 
       // 2. Temperatura
       let temp = TEMPERATURAS[prog][suciedad];
+      let tempMotivo = {
+        ligera: "con poca suciedad no hace falta más calor",
+        normal: "es suficiente para una suciedad normal",
+        intensa: "más calor para la suciedad intensa",
+      }[suciedad];
       const soloToallas = tejidos.length === 1 && tiene("toallas");
-      if (soloToallas && prog === "algodon") temp = 60;
-      if (color === "oscuro") temp = Math.min(temp, 40);
-      if (tiene("vaqueros") || tiene("deporte")) temp = Math.min(temp, 40);  // a 60 °C encogen o se dañan
-      temp = Math.min(temp, PROGRAMAS[prog].tempMax);
+      if (soloToallas && prog === "algodon") {
+        temp = 60;
+        tempMotivo = "las toallas necesitan al menos 60 °C para quedar higiénicas";
+      }
+      if (color === "oscuro" && temp > 40) {
+        temp = 40;
+        tempMotivo = "la ropa oscura no pasa de 40 °C para no desteñir";
+      }
+      if ((tiene("vaqueros") || tiene("deporte")) && temp > 40) {   // a 60 °C encogen o se dañan
+        temp = 40;
+        tempMotivo = "los vaqueros y la ropa de deporte no pasan de 40 °C para no encoger ni estropearse";
+      }
+      if (temp > PROGRAMAS[prog].tempMax) {
+        temp = PROGRAMAS[prog].tempMax;
+        tempMotivo = `es lo máximo que permite el programa ${PROGRAMAS[prog].nombre}`;
+      }
+      if (temp === 0) tempMotivo = "las prendas delicadas se cuidan mejor en frío";
 
       // 2b. Centrifugado: manda la prenda que pide menos vueltas
       const limita = tejidos.reduce((a, b) => CENTRIFUGADO[b].rpm < CENTRIFUGADO[a].rpm ? b : a);
@@ -417,7 +563,7 @@
         avisos.unshift(`${PROGRAMAS[prog].nombre} admite como mucho ${PROGRAMAS[prog].cargaMax} kg: si llevas más, hazlo en dos tandas.`);
       }
 
-      return { prog, temp, rpm, rpmMotivo, opciones, productos, avisos, consejos, excede };
+      return { prog, temp, tempMotivo, rpm, rpmMotivo, opciones, productos, avisos, consejos, excede };
     }
 
     // ---------- 3.4 PANTALLA ----------
@@ -449,10 +595,7 @@
       return `
         ${titulo ? `<p class="ajustes" style="margin:0 0 4px">${titulo}</p>` : ""}
         <h2>${p.nombre}</h2>
-        <p class="ajustes">${tempTexto} · ${r.rpm} rpm · máx. ${p.cargaMax} kg</p>
-        <h3>Centrifugado: ${r.rpm} rpm</h3>
-        <p class="nota" style="margin-top:0">Pulsa «Centrif.» hasta que ponga ${r.rpm}: ${r.rpmMotivo}.</p>
-        ${r.opciones.length ? "<h3>Activa</h3><ul>" + r.opciones.map(o => `<li>• ${o}</li>`).join("") + "</ul>" : ""}
+        <p class="ajustes">${[tempTexto, `${r.rpm} rpm`, `máx. ${p.cargaMax} kg`, ...r.opciones.map(o => o.split(" (")[0])].join(" · ")}</p>
         <h3>Productos</h3>
         <table class="productos">${filas}</table>
         <p class="nota">Cantidades ajustadas a la ropa que llevas.</p>
@@ -499,10 +642,128 @@
       resultado.innerHTML = tarjeta(r);
     }
 
-    formulario.addEventListener("change", actualizar);
-    actualizar();
+    // ---------- 3.5 NAVEGACIÓN ENTRE PANTALLAS ----------
+    const pantallas = [...document.querySelectorAll(".pantalla")];
+    const ULTIMA = pantallas.length - 1;          // la pantalla de resultado
+    const PREGUNTAS = ULTIMA - 1;                 // pantallas con pregunta (1 a 5)
+    let pasoActual = 0;
 
-    // ---------- 3.5 APP INSTALABLE ----------
+    // Cabecera (solo barra de progreso) en todas las pantallas menos la de inicio
+    pantallas.slice(1).forEach((pantalla, i) => {
+      const paso = i + 1;
+      const esResultado = paso === ULTIMA;
+      pantalla.insertAdjacentHTML("afterbegin", `
+        <div class="cabecera">
+          <div class="progreso"><span style="width:${esResultado ? 100 : (paso / PREGUNTAS) * 100}%"></span></div>
+          <span class="contador">${esResultado ? "✓" : `${paso}/${PREGUNTAS}`}</span>
+        </div>`);
+
+      // Botón "Atrás" grande abajo, al lado de "Siguiente" / "Nuevo lavado"
+      // (en la primera pregunta no hace falta: no hay nada detrás)
+      // (la pantalla de resultado no tiene botones abajo)
+      const pie = pantalla.querySelector(".pie");
+      if (paso > 1 && pie) {
+        pie.classList.add("pie-fila");
+        pie.insertAdjacentHTML("afterbegin", `<button type="button" class="boton-secundario atras">Atrás</button>`);
+      }
+    });
+
+    // Guarda el texto original de cada botón "Siguiente" para poder cambiarlo a "Guardar"
+    document.querySelectorAll(".siguiente").forEach(b => b.dataset.texto = b.textContent);
+
+    // Modo edición: vienes del resumen para corregir una respuesta
+    let modoEdicion = false;
+
+    // Textos para el resumen
+    const TEXTOS = {
+      color:    { blanco: "⚪ Blanco", color: "🎨 Color", oscuro: "⚫ Oscuro" },
+      suciedad: { ligera: "Ligera", normal: "Normal", intensa: "Mucho" },
+      carga:    { poca: "Poca (hasta 2 kg)", media: "Media (2–4 kg)", mucha: "Mucha (más de 4 kg)" },
+    };
+
+    function pintarResumen() {
+      const e = leerFormulario();
+      const extras = [e.olor && "Mal olor", e.prisa && "Prisa"].filter(Boolean);
+      const filas = [
+        { paso: 1, etiqueta: "Ropa",     valor: e.tejidos.map(t => NOMBRE_TEJIDO[t]).join(", ") },
+        { paso: 2, etiqueta: "Color",    valor: TEXTOS.color[e.color] },
+        { paso: 3, etiqueta: "Suciedad", valor: TEXTOS.suciedad[e.suciedad] },
+        { paso: 4, etiqueta: "Cantidad", valor: TEXTOS.carga[e.carga] },
+        { paso: 5, etiqueta: "Extras",   valor: extras.length ? extras.join(", ") : "Nada" },
+      ];
+      document.getElementById("resumen").innerHTML = filas.map(f => `
+        <button type="button" data-paso="${f.paso}">
+          <span><span class="etiqueta">${f.etiqueta}</span>${f.valor || "—"}</span>
+          <span class="editar">✏️ Cambiar</span>
+        </button>`).join("");
+    }
+
+    // Tocar una fila del resumen → ir a esa pregunta en modo edición
+    document.getElementById("resumen").addEventListener("click", e => {
+      const fila = e.target.closest("button[data-paso]");
+      if (!fila) return;
+      modoEdicion = true;
+      mostrar(Number(fila.dataset.paso));
+    });
+
+    // Después de responder: en modo edición vuelve al resultado, si no, pasa a la siguiente
+    function avanzar() {
+      if (modoEdicion) history.back();
+      else mostrar(pasoActual + 1);
+    }
+
+    // ¿Está respondida la pregunta de esta pantalla?
+    function respondida(pantalla) {
+      const campo = pantalla.dataset.campo;
+      const datos = new FormData(formulario);
+      if (campo === "tejido") return datos.getAll("tejido").length > 0;
+      if (["color", "suciedad", "carga"].includes(campo)) return datos.has(campo);
+      return true;   // inicio, extras y resultado no obligan a nada
+    }
+
+    // Activa o desactiva el botón "Siguiente" de cada pantalla
+    function actualizarBotones() {
+      pantallas.forEach(p => {
+        const boton = p.querySelector(".siguiente");
+        if (boton) boton.disabled = !respondida(p);
+      });
+    }
+
+    // Enseña la pantalla número n
+    function mostrar(n, guardarEnHistorial = true) {
+      pasoActual = n;
+      if (n === ULTIMA || n === 0) modoEdicion = false;
+      pantallas.forEach((p, i) => p.classList.toggle("activa", i === n));
+      if (n === ULTIMA) { actualizar(); pintarResumen(); }
+      // En modo edición, "Siguiente" pasa a llamarse "Guardar"
+      document.querySelectorAll(".siguiente").forEach(b => {
+        b.textContent = modoEdicion && n !== 0 ? "Guardar" : b.dataset.texto;
+      });
+      actualizarBotones();
+      window.scrollTo(0, 0);
+      // Así el botón "atrás" del móvil vuelve a la pantalla anterior
+      if (guardarEnHistorial) history.pushState({ paso: n }, "");
+    }
+
+    // Botones "Siguiente" / "Empezar" / "Ver mi lavado"
+    document.querySelectorAll(".siguiente").forEach(boton =>
+      boton.addEventListener("click", avanzar));
+
+    // Botones "Atrás"
+    document.querySelectorAll(".atras").forEach(boton =>
+      boton.addEventListener("click", () => history.back()));
+
+    // Botón atrás del móvil
+    window.addEventListener("popstate", e => mostrar(e.state ? e.state.paso : 0, false));
+
+    // Al marcar opciones solo se activa el botón "Siguiente": para avanzar hay que pulsarlo
+    formulario.addEventListener("change", actualizarBotones);
+
+
+    history.replaceState({ paso: 0 }, "");
+    actualizarBotones();
+
+    // ---------- 3.6 APP INSTALABLE ----------
     // Registra el service worker (sw.js) para que la app funcione sin internet
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("sw.js");

@@ -3,13 +3,14 @@
 // ⚠️ Cada vez que cambies algún archivo, sube el número de VERSION
 //    para que el móvil descargue la versión nueva.
 
-const VERSION = "lavadorapp-v1";
+const VERSION = "lavadorapp-v12";
 const ARCHIVOS = [
   "./",
   "./index.html",
   "./manifest.json",
   "./icono-192.png",
   "./icono-512.png",
+  "./icono-maskable-512.png",
 ];
 
 // 1. Al instalar: guarda todos los archivos
