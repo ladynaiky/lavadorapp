@@ -183,6 +183,17 @@
     }
     .resumen .etiqueta { color: var(--suave); font-size: 0.8rem; display: block; }
     .resumen .editar { color: var(--seleccion); font-size: 0.85rem; white-space: nowrap; }
+
+    /* Tarjetas de la pantalla 1 (tipo de ropa): emoji grande arriba, nombre debajo */
+    .opciones.rejilla label {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 10px; min-height: 124px; padding: 18px 10px;
+      text-align: center; border-radius: 18px;
+      transition: transform 0.15s, background 0.15s;
+    }
+    .opciones.rejilla .emoji { font-size: 2.6rem; line-height: 1; }
+    .opciones.rejilla .nombre { font-size: 0.98rem; line-height: 1.25; }
+    .opciones.rejilla label:active { transform: scale(0.97); }
   </style>
 </head>
 
@@ -220,14 +231,14 @@
         <h2 class="pregunta">¿Qué vas a lavar?</h2>
         <p class="ayuda">Marca todo lo que lleves</p>
         <div class="opciones rejilla">
-          <label><input type="checkbox" name="tejido" value="algodon"> 👚 Algodón / lino</label>
-          <label><input type="checkbox" name="tejido" value="toallas"> 🛏️ Toallas y sábanas</label>
-          <label><input type="checkbox" name="tejido" value="sinteticos"> 🧥 Sintéticos</label>
-          <label><input type="checkbox" name="tejido" value="camisas"> 👔 Camisas / blusas</label>
-          <label><input type="checkbox" name="tejido" value="deporte"> 🎽 Ropa de deporte</label>
-          <label><input type="checkbox" name="tejido" value="vaqueros"> 👖 Vaqueros</label>
-          <label><input type="checkbox" name="tejido" value="delicado"> 👗 Delicado / seda</label>
-          <label><input type="checkbox" name="tejido" value="lana"> 🧣 Lana</label>
+          <label><input type="checkbox" name="tejido" value="algodon"><span class="emoji" aria-hidden="true">👚</span><span class="nombre">Algodón / lino</span></label>
+          <label><input type="checkbox" name="tejido" value="toallas"><span class="emoji" aria-hidden="true">🛏️</span><span class="nombre">Toallas y sábanas</span></label>
+          <label><input type="checkbox" name="tejido" value="sinteticos"><span class="emoji" aria-hidden="true">🧥</span><span class="nombre">Sintéticos</span></label>
+          <label><input type="checkbox" name="tejido" value="camisas"><span class="emoji" aria-hidden="true">👔</span><span class="nombre">Camisas / blusas</span></label>
+          <label><input type="checkbox" name="tejido" value="deporte"><span class="emoji" aria-hidden="true">🎽</span><span class="nombre">Ropa de deporte</span></label>
+          <label><input type="checkbox" name="tejido" value="vaqueros"><span class="emoji" aria-hidden="true">👖</span><span class="nombre">Vaqueros</span></label>
+          <label><input type="checkbox" name="tejido" value="delicado"><span class="emoji" aria-hidden="true">👗</span><span class="nombre">Delicado / seda</span></label>
+          <label><input type="checkbox" name="tejido" value="lana"><span class="emoji" aria-hidden="true">🧣</span><span class="nombre">Lana</span></label>
         </div>
         <div class="pie"><button type="button" class="boton-principal siguiente">Siguiente</button></div>
       </section>

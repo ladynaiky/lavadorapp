@@ -3,7 +3,7 @@
 // ⚠️ Cada vez que cambies algún archivo, sube el número de VERSION
 //    para que el móvil descargue la versión nueva.
 
-const VERSION = "lavadorapp-v12";
+const VERSION = "lavadorapp-v13";
 const ARCHIVOS = [
   "./",
   "./index.html",
